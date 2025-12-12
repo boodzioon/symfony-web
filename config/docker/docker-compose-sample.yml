@@ -43,6 +43,6 @@ services:
       - symfony-webapp-db
     environment:
       PGADMIN_LISTEN_PORT: 5050
-      PGADMIN_DEFAULT_EMAIL: boodzioo_n@o2.pl
+      PGADMIN_DEFAULT_EMAIL: email@email.void
       PGADMIN_DEFAULT_PASSWORD: password
       DATABASE_HOST: symfony-webapp-db
