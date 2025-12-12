@@ -1,0 +1,48 @@
+services:
+  symfony-webapp-web:
+    container_name: symfony-webapp-web
+    image: shinsenter/symfony:php8
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - symfony-webapp-db
+    volumes:
+      - ./app:/var/www/html
+    environment:
+      PHP_DISPLAY_ERRORS: "1"
+      PHP_POST_MAX_SIZE: "100M"
+      PHP_UPLOAD_MAX_FILESIZE: "16M"
+      PHP_SHORT_OPEN_TAG: false
+      DATABASE_USER: webapp-user
+      DATABASE_PASSWORD: webapp-password
+      DATABASE_DB: webapp
+      DATABASE_HOST: symfony-webapp-db
+  symfony-webapp-node:
+    container_name: symfony-webapp-node
+    image: node:lts-alpine
+    command: sh -c "npm install && ./node_modules/.bin/encore production --watch"
+    working_dir: /app
+    volumes:
+      - ./app:/app
+  symfony-webapp-db:
+    container_name: symfony-webapp-db
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: webapp-user
+      POSTGRES_PASSWORD: webapp-password
+      POSTGRES_DB: webapp
+  symfony-webapp-db-admin:
+    container_name: symfony-webapp-db-admin
+    image: dpage/pgadmin4
+    ports:
+      - 5050:5050
+    depends_on:
+      - symfony-webapp-db
+    environment:
+      PGADMIN_LISTEN_PORT: 5050
+      PGADMIN_DEFAULT_EMAIL: boodzioo_n@o2.pl
+      PGADMIN_DEFAULT_PASSWORD: password
+      DATABASE_HOST: symfony-webapp-db
