@@ -1,25 +1,15 @@
-<!doctype html>
-<html lang="en">
+{% extends 'base.html.twig' %}
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% block title %}Awesome videos - admin panel{% endblock %}
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="../assets/css/styles.css">
+{% block customstylesheets %}
+    <link href="{{asset('assets/css/dashboard.css')}}" rel="stylesheet">
+{% endblock %}
 
-    <!-- Custom styles for this template -->
-    <link href="../assets/css/dashboard.css" rel="stylesheet">
+{% block menu %}
+{% endblock %}
 
-    <link rel="stylesheet" href="../assets/css/fontawesome.min.css">
-
-    <title>Awesome videos - admin panel</title>
-</head>
-
-<body class="text-center">
-<div class="container-fluid">
-
+{% block main %}
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
         <h5 class="my-0 mr-md-auto font-weight-normal">Awesome Videos</h5>
         <a class="nav-link active" href="../"> Go to public site</a>      
@@ -34,31 +24,31 @@
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="my_profile.php">
+                            <a class="nav-link" href="{{path('admin_main_page')}}">
                                 <span data-feather="file"></span>
                                 My profile
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="categories.php">
+                            <a class="nav-link" href="{{path('admin_categories')}}">
                                 <span data-feather="file"></span>
                                 Categories
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="videos.php">
+                            <a class="nav-link" href="{{path('admin_videos')}}">
                                 <span data-feather="shopping-cart"></span>
                                 Videos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="upload_video.php">
+                            <a class="nav-link" href="{{path('admin_upload_video')}}">
                                 <span data-feather="shopping-cart"></span>
                                 Upload a video
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="users.php">
+                            <a class="nav-link" href="{{path('admin_users')}}">
                                 <span data-feather="users"></span>
                                 Users
                             </a>
@@ -72,3 +62,17 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><a href="my_profile.php">Dashboard</a></h1>
                 </div>
+                {% block mainadmin %}{% endblock %}
+            </main>
+        </div>
+{% endblock %}
+{% block footerlinks %}{% endblock %}
+{% block customjavascripts %}
+<script>
+    $('input[type="file"]').change(function (e) {
+        var fileName = e.target.files[0].name;
+        console.log(e.target.files[0]);
+        $('.custom-file-label').html(fileName);
+    });
+</script>
+{% endblock %}

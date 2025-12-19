@@ -1,46 +1,50 @@
-<?php include('includes/_header.php'); ?>
+{% extends 'admin/base.html.twig' %}
 
+{% block customstylesheets %}
+{{parent()}}
 <style>
     .fa-ul>li {
     margin-top: 15px;
 }
 </style>
+{% endblock %}
 
+{% block mainadmin %}
 <h2>Categories list</h2>
 
 <ul class="fa-ul text-left">
-    <li><i class="fa-li fa fa-arrow-right"></i>Funny <a href="edit_category.php">edit</a> <a onclick="return confirm('Are you sure?');"
+    <li><i class="fa-li fa fa-arrow-right"></i>Funny <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
                 href="#">delete</a></li>
     <ul class="fa-ul text-left">
-        <li><i class="fa-li fa fa-arrow-right"></i>For kids <a href="edit_category.php">edit</a> <a onclick="return confirm('Are you sure?');"
+        <li><i class="fa-li fa fa-arrow-right"></i>For kids <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
                 href="#">delete</a></li>
-        <li><i class="fa-li fa fa-arrow-right"></i>For adults <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+        <li><i class="fa-li fa fa-arrow-right"></i>For adults <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
                 href="#">delete</a></li>
         <ul class="fa-ul text-left">
-            <li><i class="fa-li fa fa-arrow-right"></i>Strange <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+            <li><i class="fa-li fa fa-arrow-right"></i>Strange <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
                     href="#">delete</a></li>
         </ul>
     </ul>
-    <li><i class="fa-li fa fa-arrow-right"></i>Scary <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+    <li><i class="fa-li fa fa-arrow-right"></i>Scary <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
             href="#">delete</a></li>
-    <li><i class="fa-li fa fa-arrow-right"></i>Unbelievable <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+    <li><i class="fa-li fa fa-arrow-right"></i>Unbelievable <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
             href="#">delete</a></li>
-    <li><i class="fa-li fa fa-arrow-right"></i>Inspirational <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+    <li><i class="fa-li fa fa-arrow-right"></i>Inspirational <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
             href="#">delete</a></li>
-    <li><i class="fa-li fa fa-arrow-right"></i>Motivating <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+    <li><i class="fa-li fa fa-arrow-right"></i>Motivating <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
             href="#">delete</a></li>
-    <li><i class="fa-li fa fa-arrow-right"></i>Surprising <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+    <li><i class="fa-li fa fa-arrow-right"></i>Surprising <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
             href="#">delete</a></li>
     <li><i class="fa-li fa fa-arrow-right"></i>Sad</li>
     <ul class="fa-ul text-left">
-        <li><i class="fa-li fa fa-arrow-right"></i>Strange <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+        <li><i class="fa-li fa fa-arrow-right"></i>Strange <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
                 href="#">delete</a></li>
         <ul class="fa-ul text-left">
-            <li><i class="fa-li fa fa-arrow-right"></i>Boring <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+            <li><i class="fa-li fa fa-arrow-right"></i>Boring <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
                     href="#">delete</a></li>
         </ul>
     </ul>
-    <li><i class="fa-li fa fa-arrow-right"></i>Relaxing <a href="#">edit</a> <a onclick="return confirm('Are you sure?');"
+    <li><i class="fa-li fa fa-arrow-right"></i>Relaxing <a href="{{path('admin_edit_category')}}">edit</a> <a onclick="return confirm('Are you sure?');"
             href="#">delete</a></li>
 </ul>
 
@@ -65,6 +69,4 @@
         <button class="btn btn-primary mt-3" type="submit">Add</button>
     </div>
 </form>
-
-
-<?php include('includes/_footer.php'); ?>
+{% endblock %}
