@@ -85,7 +85,7 @@ class CategoryFixtures extends Fixture
         return [
             ['Laptops', 8],
             ['Desktops', 9],
-            ['AIO', 10]
+            ['AIOs', 10]
         ];
     }
 

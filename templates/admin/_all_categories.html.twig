@@ -1,0 +1,6 @@
+<select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
+    <option selected value="0">No parent</option>
+    {% for category in categories.categoryList %}
+        <option selected value="{{ category.id }}">{{ category.name }}</option>
+    {% endfor %}
+</select>

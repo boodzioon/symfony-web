@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 abstract class CategoryTreeAbstract
 {
 
-    public string $categoryList = '';
+    public $categoryList = null;
     public array $categoriesArrayFromDb;
     protected static $dbConnection;
 
@@ -47,7 +47,7 @@ abstract class CategoryTreeAbstract
             return self::$dbConnection;
         } else {
             $conn = $this->em->getConnection();
-            $sql = "SELECT * FROM categories";
+            $sql = "SELECT * FROM categories ORDER BY name";
             $result = $conn->executeQuery($sql);
 
             return self::$dbConnection = $result->fetchAllAssociative();

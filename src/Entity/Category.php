@@ -21,6 +21,7 @@ class Category
     private ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subcategories')]
+    #[ORM\JoinColumn(name: "parent_id", referencedColumnName: "id", onDelete: 'CASCADE')]
     private ?self $parent = null;
 
     /**
