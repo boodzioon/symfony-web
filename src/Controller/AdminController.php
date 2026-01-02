@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Form\CategoryType;
 use App\Utils\CategoryTreeAdminList;
 use App\Utils\CategoryTreeAdminOptionList;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,22 +21,44 @@ final class AdminController extends AbstractController
         return $this->render('admin/my_profile.html.twig');
     }
 
-    #[Route('/categories', name: 'admin_categories')]
-    public function categories(CategoryTreeAdminList $categories): Response
+    #[Route('/categories', name: 'admin_categories', methods: ['GET', 'POST'])]
+    public function categories(CategoryTreeAdminList $categories, Request $request, EntityManagerInterface $em): Response
     {
         $categories->getCategoryList($categories->buildTree());
 
+        $category = new Category;
+        $form = $this->createForm(CategoryType::class, $category);
+        $form->handleRequest($request);
+
+        $isInvalid = null;
+        if ($form->isSubmitted() && $form->isValid()) {
+            $parent = $em->getRepository(Category::class)->find($request->request->all('category')['parent']);
+            $category->setName($request->request->all('category')['name']);
+            $category->setParent($parent);
+
+            $em->persist($category);
+            $em->flush();
+        } elseif ($request->isMethod('POST')) {
+            $isInvalid = ' is-invalid';
+        }
+
         return $this->render('admin/categories.html.twig',
             [
-                'categories' => $categories->categoryList
+                'categories' => $categories->categoryList,
+                'form' => $form,
+                'is_invalid' => $isInvalid
             ]
         );
     }
 
     #[Route('/edit-category/{id}', name: 'admin_edit_category')]
-    public function editCategory(): Response
+    public function editCategory(Category $category, Request $request): Response
     {
-        return $this->render('admin/edit_category.html.twig');
+        if ($request->getMethod() == 'POST') {
+            dump('POST');
+        }
+
+        return $this->render('admin/edit_category.html.twig', ['category' => $category]);
     }
 
     #[Route('/delete-category/{id}', name: 'admin_delete_category')]
@@ -64,12 +88,13 @@ final class AdminController extends AbstractController
         return $this->render('admin/upload_video.html.twig');
     }
 
-    public function getAllCategories(CategoryTreeAdminOptionList $categories): Response
+    public function getAllCategories(CategoryTreeAdminOptionList $categories, $editedCategory = null): Response
     {
         $categories->getCategoryList($categories->buildTree());
 
         return $this->render('admin/_all_categories.html.twig', [
-            'categories' => $categories
+            'categories' => $categories,
+            'editedCategory' => $editedCategory
         ]);
     }
 }

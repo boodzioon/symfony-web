@@ -6,10 +6,12 @@ use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Index as Index;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ORM\Table(name: "categories")]
+#[UniqueEntity('name', 'The name of category exist!')]
 class Category
 {
     #[ORM\Id]
@@ -18,6 +20,7 @@ class Category
     private ?int $id = null;
 
     #[ORM\Column(length: 45, unique: true)]
+    #[Assert\NotBlank(message: 'The name of category is required')]
     private ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subcategories')]

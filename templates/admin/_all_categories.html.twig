@@ -1,6 +1,7 @@
-<select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
-    <option selected value="0">No parent</option>
-    {% for category in categories.categoryList %}
-        <option selected value="{{ category.id }}">{{ category.name }}</option>
-    {% endfor %}
-</select>
+<option {% if editedCategory.parent is defined and editedCategory.parent is null %} selected {% endif %} value="0">No parent
+</option>
+
+{% for category in categories.categoryList %}
+	<option {% if editedCategory.parent.getId() is defined and editedCategory.parent.getId() == category.id %} selected {% endif %} value="{{ category.id }}">{{ category.name }}
+	</option>
+{% endfor %}
