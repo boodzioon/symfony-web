@@ -17,7 +17,7 @@ class CategoryTreeFrontPage extends CategoryTreeAbstract
     public $html_6 = '</li>';
     public $html_7 = '</ul>';
 
-    private AppExtensionRuntime $slugger;
+    public AppExtensionRuntime $slugger;
 
     public function getCategoryListAndParent(int $id): string
     {
