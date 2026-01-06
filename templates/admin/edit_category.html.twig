@@ -2,18 +2,5 @@
 
 {% block mainadmin %}
 <h2>Editing category</h2>
-
-<form action="#" method="POST">
-    <input type="text" class="form-control is-invalid" id="{{ category.id }}" placeholder="Category name" value="{{ category.name }}"
-        required>
-    <br>
-    <label for="inlineFormCustomSelect">Parent:</label>
-    <select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
-        {{ render(controller('App\\Controller\\AdminController::getAllCategories', {'editedCategory': category})) }}
-    </select>
-    <div class="invalid-feedback">
-        Category already exists!
-    </div>
-    <button class="btn btn-primary mt-3" type="submit">Save</button>
-</form>
+{% include 'admin/_category_form.html.twig' with { 'form': form, 'category': category, 'submit_text': 'Save' } %}
 {% endblock %}

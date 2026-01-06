@@ -1,0 +1,16 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }}
+    {{ form_widget(form.name, {'attr': {'class': 'form-control' ~ is_invalid, 'placeholder': 'Category name', 'id': 'validationServer01'} }) }}
+    <br>
+    <label for="inlineFormCustomSelect">Parent:</label>
+    <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name="category[parent]">
+        {% if category is defined %}
+            {{ render(controller('App\\Controller\\AdminController::getAllCategories', {'editedCategory': category} )) }}
+        {% else %}
+            {{ render(controller('App\\Controller\\AdminController::getAllCategories')) }}
+        {% endif %}
+    </select>
+    <div class="invalid-feedback">
+            {{ form_errors(form.name) }}
+    </div>
+    <button class="btn btn-primary mt-3" type="submit">{{ submit_text }}</button>
+{{ form_end(form) }}

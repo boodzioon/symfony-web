@@ -28,16 +28,10 @@ final class AdminController extends AbstractController
 
         $category = new Category;
         $form = $this->createForm(CategoryType::class, $category);
-        $form->handleRequest($request);
 
         $isInvalid = null;
-        if ($form->isSubmitted() && $form->isValid()) {
-            $parent = $em->getRepository(Category::class)->find($request->request->all('category')['parent']);
-            $category->setName($request->request->all('category')['name']);
-            $category->setParent($parent);
-
-            $em->persist($category);
-            $em->flush();
+        if ($this->saveCategory($category, $form, $request, $em)) {
+            return $this->redirectToRoute('admin_categories');
         } elseif ($request->isMethod('POST')) {
             $isInvalid = ' is-invalid';
         }
@@ -52,13 +46,22 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/edit-category/{id}', name: 'admin_edit_category')]
-    public function editCategory(Category $category, Request $request): Response
+    public function editCategory(Category $category, Request $request, EntityManagerInterface $em): Response
     {
-        if ($request->getMethod() == 'POST') {
-            dump('POST');
+        $form = $this->createForm(CategoryType::class, $category);
+
+        $isInvalid = null;
+        if ($this->saveCategory($category, $form, $request, $em)) {
+            return $this->redirectToRoute('admin_categories');
+        } elseif ($request->isMethod('POST')) {
+            $isInvalid = ' is-invalid';
         }
 
-        return $this->render('admin/edit_category.html.twig', ['category' => $category]);
+        return $this->render('admin/edit_category.html.twig', [
+            'category' => $category,
+            'form' => $form,
+            'is_invalid' => $isInvalid
+        ]);
     }
 
     #[Route('/delete-category/{id}', name: 'admin_delete_category')]
@@ -96,5 +99,23 @@ final class AdminController extends AbstractController
             'categories' => $categories,
             'editedCategory' => $editedCategory
         ]);
+    }
+
+    private function saveCategory($category, $form, $request, $em)
+    {
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $parent = $em->getRepository(Category::class)->find($request->request->all('category')['parent']);
+            $category->setName($request->request->all('category')['name']);
+            $category->setParent($parent);
+
+            $em->persist($category);
+            $em->flush();
+
+            return true;
+        }
+
+        return false;
     }
 }
