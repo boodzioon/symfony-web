@@ -24,7 +24,7 @@ abstract class CategoryTreeAbstract
 
     abstract public function getCategoryList(array $categoriesArray);
 
-    public function buildTree(int $parentId = null): array
+    public function buildTree(?int $parentId = null): array
     {
         $subcategory = [];
 
