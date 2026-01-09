@@ -38,9 +38,33 @@ class VideoRepository extends ServiceEntityRepository
             ->setParameter('ids', $ids)
             ->orderBy('v.title', $sortMethod)
             ->getQuery();
-        $pagination = $this->paginator->paginate($dbQuery, $page);
 
-        return $pagination;
+        return $this->paginator->paginate($dbQuery, $page);
+    }
+
+    public function findByTitle(string $query, int $page, ?string $sortMethod)
+    {
+        $sortMethod = $sortMethod != 'rating' ? $sortMethod : 'ASC';
+
+        $queryBuilder = $this->createQueryBuilder('v');
+        $searchTerms = $this->prepareQuery($query);
+
+        foreach ($searchTerms as $key => $term) {
+            $queryBuilder
+                ->orWhere('lower(v.title) LIKE lower(:t_' . $key . ')')
+                ->setParameter('t_' . $key, '%' . trim($term) . '%');
+        }
+
+        $dbQuery = $queryBuilder
+            ->orderBy('v.title', $sortMethod)
+            ->getQuery();
+
+        return $this->paginator->paginate($dbQuery, $page);
+    }
+
+    private function prepareQuery(string $query)
+    {
+        return explode(' ', $query);
     }
 
 }

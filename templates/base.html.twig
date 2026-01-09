@@ -33,8 +33,8 @@
 						<a href="{{path('main_page')}}">Awesome Videos</a>
 					</h5>
 
-					<form method="POST" class="form-inline my-0 mr-md-auto" action="{{path('search_results')}}">
-						<input class="form-control mr-sm-2" type="search" placeholder="video title" aria-label="Search video">
+					<form method="GET" class="form-inline my-0 mr-md-auto" action="{{path('search_results')}}">
+						<input name="query" class="form-control mr-sm-2" type="search" placeholder="video title" aria-label="Search video">
 						<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search video</button>
 					</form>
 
