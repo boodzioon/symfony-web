@@ -78,9 +78,9 @@ class AdminControllerCategoriesTest extends WebTestCase
 
     public function testDeleteCategory(): void
     {
-        $crawler = $this->client->request('GET', '/admin/delete-category/2');
+        $crawler = $this->client->request('GET', '/admin/delete-category/1');
 
-        $category = $this->em->getRepository(Category::class)->find(2);
+        $category = $this->em->getRepository(Category::class)->find(1);
         $this->assertNull($category);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Video;
 use App\Utils\CategoryTreeFrontPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,13 +18,20 @@ final class FrontController extends AbstractController
         return $this->render('front/index.html.twig');
     }
 
-    #[Route('/video-list/category/{categoryName},{id}', name: 'video_list')]
-    public function videoList(int $id, CategoryTreeFrontPage $categories): Response
+    #[Route('/video-list/category/{categoryName},{id}/{page?1}', name: 'video_list')]
+    public function videoList(int $id, int $page, CategoryTreeFrontPage $categories, EntityManagerInterface $em): Response
     {
         $categories->getCategoryListAndParent($id);
 
+        $ids = $categories->getChildIds($id);
+        $ids = [...$ids, $id];
+        $videos = $em->getRepository(Video::class)->findByChildIds($ids, $page);
+
         return $this->render('front/video_list.html.twig',
-            ['subcategories' => $categories]
+            [
+                'subcategories' => $categories,
+                'videos' => $videos
+            ]
         );
     }
 

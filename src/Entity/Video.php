@@ -21,7 +21,7 @@ class Video
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $duration = null;
 
     #[ORM\ManyToOne(inversedBy: 'videos')]
@@ -61,7 +61,7 @@ class Video
         return $this->duration;
     }
 
-    public function setDuration(int $duration): static
+    public function setDuration(?int $duration): static
     {
         $this->duration = $duration;
 
