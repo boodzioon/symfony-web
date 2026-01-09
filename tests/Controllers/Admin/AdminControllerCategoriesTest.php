@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Tests\Controllers;
+namespace App\Tests\Controllers\Admin;
 
 use App\Entity\Category;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AdminControllerCategoriesTest extends WebTestCase

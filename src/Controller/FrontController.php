@@ -48,7 +48,7 @@ final class FrontController extends AbstractController
         $videos = null;
         $query = null;
 
-        if ($request->query->get('query')) {
+        if ($request->query->get('query') !== null && trim($request->query->get('query')) != '') {
             $query = $request->query->get('query');
             $videos = $em->getRepository(Video::class)->findByTitle($query, $page, $request->query->get('sortby'));
         }

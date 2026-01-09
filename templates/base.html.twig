@@ -34,7 +34,7 @@
 					</h5>
 
 					<form method="GET" class="form-inline my-0 mr-md-auto" action="{{path('search_results')}}">
-						<input name="query" class="form-control mr-sm-2" type="search" placeholder="video title" aria-label="Search video">
+						<input name="query" class="form-control mr-sm-2" type="search" placeholder="video title" aria-label="Search video" value="{% if query is defined %}{{ query }}{% endif %}">
 						<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search video</button>
 					</form>
 
