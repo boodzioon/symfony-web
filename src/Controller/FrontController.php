@@ -3,18 +3,23 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\User;
 use App\Entity\Video;
+use App\Form\UserType;
 use App\Utils\CategoryTreeFrontPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class FrontController extends AbstractController
 {
+
     #[Route('/', name: 'main_page')]
     public function index(): Response
     {
@@ -92,9 +97,35 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/register', name: 'register')]
-    public function register(): Response
+    public function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder): Response
     {
-        return $this->render('front/register.html.twig');
+        $user = new User;
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        $isInvalid = null;
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setName($request->request->all('user')['name']);
+            $user->setLastName($request->request->all('user')['last_name']);
+            $user->setEmail($request->request->all('user')['email']);
+            $password = $passwordEncoder->hashPassword($user, $request->request->all('user')['password']['first']);
+            $user->setPassword($password);
+            $user->setRoles(['ROLE_USER']);
+
+            $em->persist($user);
+            $em->flush();
+
+            $this->loginUserAutomatically($user, $password);
+            return $this->redirectToRoute('admin_main_page');
+        } elseif ($request->isMethod('POST')) {
+            $isInvalid = ' is-invalid';
+        }
+
+        return $this->render('front/register.html.twig',
+            [
+                'form' => $form
+            ]
+        );
     }
 
     #[Route('/payment', name: 'payment')]
@@ -108,5 +139,13 @@ final class FrontController extends AbstractController
         $categories = $em->getRepository(Category::class)->findBy(['parent' => null], ['name' => 'ASC']);
 
         return $this->render('front/_main_categories.html.twig', ['categories' => $categories]);
+    }
+
+    private function loginUserAutomatically(User $user, string $password)
+    {
+        $token = new UsernamePasswordToken($user, $password, $user->getRoles());
+
+        $this->container->get('security.token_storage')->setToken($token);
+        $this->container->get('request_stack')->getSession()->set('_security_main', serialize($token));
     }
 }

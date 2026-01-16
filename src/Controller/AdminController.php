@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\User;
 use App\Form\CategoryType;
 use App\Utils\CategoryTreeAdminList;
 use App\Utils\CategoryTreeAdminOptionList;
@@ -15,6 +16,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin')]
 final class AdminController extends AbstractController
 {
+
+    public function __construct(private EntityManagerInterface $em) {}
+
     #[Route('/', name: 'admin_main_page')]
     public function index(): Response
     {
@@ -22,7 +26,7 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/su/categories', name: 'admin_categories', methods: ['GET', 'POST'])]
-    public function categories(CategoryTreeAdminList $categories, Request $request, EntityManagerInterface $em): Response
+    public function categories(CategoryTreeAdminList $categories, Request $request): Response
     {
         $categories->getCategoryList($categories->buildTree());
 
@@ -30,13 +34,14 @@ final class AdminController extends AbstractController
         $form = $this->createForm(CategoryType::class, $category);
 
         $isInvalid = null;
-        if ($this->saveCategory($category, $form, $request, $em)) {
+        if ($this->saveCategory($category, $form, $request)) {
             return $this->redirectToRoute('admin_categories');
         } elseif ($request->isMethod('POST')) {
             $isInvalid = ' is-invalid';
         }
 
-        return $this->render('admin/categories.html.twig',
+        return $this->render(
+            'admin/categories.html.twig',
             [
                 'categories' => $categories->categoryList,
                 'form' => $form,
@@ -46,12 +51,12 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/su/edit-category/{id}', name: 'admin_edit_category')]
-    public function editCategory(Category $category, Request $request, EntityManagerInterface $em): Response
+    public function editCategory(Category $category, Request $request): Response
     {
         $form = $this->createForm(CategoryType::class, $category);
 
         $isInvalid = null;
-        if ($this->saveCategory($category, $form, $request, $em)) {
+        if ($this->saveCategory($category, $form, $request)) {
             return $this->redirectToRoute('admin_categories');
         } elseif ($request->isMethod('POST')) {
             $isInvalid = ' is-invalid';
@@ -65,10 +70,10 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/su/delete-category/{id}', name: 'admin_delete_category')]
-    public function deleteCategory(Category $category, EntityManagerInterface $em): Response
+    public function deleteCategory(Category $category): Response
     {
-        $em->remove($category);
-        $em->flush();
+        $this->em->remove($category);
+        $this->em->flush();
 
         return $this->redirectToRoute('admin_categories');
     }
@@ -76,7 +81,9 @@ final class AdminController extends AbstractController
     #[Route('/su/users', name: 'admin_users')]
     public function users(): Response
     {
-        return $this->render('admin/users.html.twig');
+        $users = $this->em->getRepository(User::class)->findBy([], ['last_name' => 'ASC', 'name' => 'ASC']);
+
+        return $this->render('admin/users.html.twig', ['users' => $users]);
     }
 
     #[Route('/videos', name: 'admin_videos')]
@@ -103,17 +110,17 @@ final class AdminController extends AbstractController
         ]);
     }
 
-    private function saveCategory($category, $form, $request, $em)
+    private function saveCategory($category, $form, $request)
     {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $parent = $em->getRepository(Category::class)->find($request->request->all('category')['parent']);
+            $parent = $this->em->getRepository(Category::class)->find($request->request->all('category')['parent']);
             $category->setName($request->request->all('category')['name']);
             $category->setParent($parent);
 
-            $em->persist($category);
-            $em->flush();
+            $this->em->persist($category);
+            $this->em->flush();
 
             return true;
         }

@@ -1,0 +1,46 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }}
+<!-- <form method="POST" action="#" class="needs-validation" novalidate> -->
+	<div class="row">
+		<div class="col-md-6 mb-3">
+			<label for="user_name">First name</label>
+			{{ form_widget(form.name) }}
+			<div class="invalid-feedback">
+				{{ form_errors(form.name) }}
+			</div>
+		</div>
+		<div class="col-md-6 mb-3">
+			<label for="user_last_name">Last name</label>
+			{{ form_widget(form.last_name) }}
+			<div class="invalid-feedback">
+				{{ form_errors(form.last_name) }}
+			</div>
+		</div>
+	</div>
+
+	<div class="mb-3">
+		<label for="user_email">Email</label>
+		{{ form_widget(form.email) }}
+		<div class="invalid-feedback">
+			{{ form_errors(form.email) }}
+		</div>
+	</div>
+
+	<div class="mb-3">
+		<label for="user_password_first">Password</label>
+		{{ form_widget(form.password.first) }}
+		<div class="invalid-feedback">
+			{{ form_errors(form.password.first) }}
+		</div>
+	</div>
+
+	<div class="mb-3">
+		<label for="user_password_second">Confirm Password</label>
+		{{ form_widget(form.password.second) }}
+		<div class="invalid-feedback">
+			{{ form_errors(form.password.second) }}
+		</div>
+	</div>
+
+	<hr class="mb-4">
+	<button type="submit" class="btn btn-primary btn-lg btn-block" role="button">Register</button>
+{{ form_end(form) }}
