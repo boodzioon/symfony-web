@@ -17,6 +17,7 @@
 		</style>
 
 		<link rel="stylesheet" href="{{asset('assets/css/fontawesome.min.css')}}"> {% block customstylesheets %}{% endblock %}
+    	{{ importmap() }}
 
 		<title>
 			{% block title %}Symfony 4 course app - video sharing service
@@ -131,6 +132,6 @@
 		    $(function () {
 		        $('[data-toggle="tooltip"]').tooltip()
 		    })
-		</script>{% block customjavascripts %}
-	{% endblock %}
+		</script>
+	{% block customjavascripts %}{% endblock %}
 </body></html>

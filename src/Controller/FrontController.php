@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class FrontController extends AbstractController
 {
@@ -57,7 +59,8 @@ final class FrontController extends AbstractController
             [
                 'videos' => $videos,
                 'query' => $query
-            ]);
+            ]
+        );
     }
 
     #[Route('/pricing', name: 'pricing')]
@@ -67,9 +70,25 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/login', name: 'login')]
-    public function login(): Response
+    public function login(AuthenticationUtils $helper, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
-        return $this->render('front/login.html.twig');
+        $token = $csrfTokenManager->getToken('authenticate');
+
+        $response = $this->render('front/login.html.twig',
+            [
+                'last_name' => $helper->getLastUsername(),
+                'error' => $helper->getLastAuthenticationError()
+            ]
+        );
+        $response->headers->set('Turbo-Cache-Control', 'no-cache');
+
+        return $response;
+    }
+
+    #[Route('/logout', name: 'logout')]
+    public function logout(): void
+    {
+        throw new \Exception('This should never be reached!');
     }
 
     #[Route('/register', name: 'register')]
