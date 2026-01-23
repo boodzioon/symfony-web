@@ -14,7 +14,10 @@ class AdminControllerCategoriesTest extends WebTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->client = static::createClient();
+        $this->client = static::createClient([], [
+            'PHP_AUTH_USER' => 'jw@symf8.loc',
+            'PHP_AUTH_PW' => 'pass'
+        ]);
         $this->client->disableReboot();
 
         $this->em = $this->client->getContainer()->get('doctrine.orm.entity_manager');
@@ -32,7 +35,7 @@ class AdminControllerCategoriesTest extends WebTestCase
 
     public function testTextOnPage(): void
     {
-        $crawler = $this->client->request('GET', '/admin/categories');
+        $crawler = $this->client->request('GET', '/admin/su/categories');
 
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $this->assertSame('Categories list', $crawler->filter('h2')->text());
@@ -41,13 +44,13 @@ class AdminControllerCategoriesTest extends WebTestCase
 
     public function testNumberOfItems(): void
     {
-        $crawler = $this->client->request('GET', '/admin/categories');
+        $crawler = $this->client->request('GET', '/admin/su/categories');
         $this->assertCount(22, $crawler->filter('option'));
     }
 
     public function testNewCategory(): void
     {
-        $crawler = $this->client->request('GET', '/admin/categories');
+        $crawler = $this->client->request('GET', '/admin/su/categories');
 
         $form = $crawler->selectButton('Add')->form([
             'category[parent]' => 1,
@@ -62,7 +65,7 @@ class AdminControllerCategoriesTest extends WebTestCase
 
     public function testEditCategory(): void
     {
-        $crawler = $this->client->request('GET', '/admin/edit-category/1');
+        $crawler = $this->client->request('GET', '/admin/su/edit-category/1');
 
         $form = $crawler->selectButton('Save')->form([
             'category[name]' => 'Electronics and RTV'
@@ -77,7 +80,7 @@ class AdminControllerCategoriesTest extends WebTestCase
 
     public function testDeleteCategory(): void
     {
-        $crawler = $this->client->request('GET', '/admin/delete-category/1');
+        $crawler = $this->client->request('GET', '/admin/su/delete-category/1');
 
         $category = $this->em->getRepository(Category::class)->find(1);
         $this->assertNull($category);

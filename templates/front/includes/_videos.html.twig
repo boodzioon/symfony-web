@@ -14,16 +14,10 @@
 						<a href="{{path('video_details', {'id': video.getId()})}}">{{video.getTitle()}}</a>
 					</h3>
 					{% if not app.user %}
-						<p class="card-text text-danger">Video for
-							<b>MEMBERS</b>
-							only.
-							<a href="{{path('pricing')}}">Sign
-																	up</a>
-							for one month for free.</p>
+						<p class="card-text text-danger">Video for <b>MEMBERS</b> only.	<a href="{{path('pricing')}}">Sign up</a> for one month for free.</p>
 					{% endif %}
 					<div class="d-flex justify-content-between align-items-center">
 						<div class="btn-group">
-
 							<i class="fa fa-thumbs-up">
 								<small class="text-muted">(23)</small>
 							</i>&nbsp;
