@@ -13,7 +13,7 @@ class FrontControllerSecurityTest extends WebTestCase
     {
         $client = $this->createClient();
         $client->followRedirects();
-        $crawler = $client->request('GET', $url);
+        $client->request('GET', $url);
         
         $this->assertStringContainsString('/login', $client->getRequest()->getRequestUri());
         $this->assertStringContainsString('Please sign in', $client->getResponse()->getContent());
@@ -31,10 +31,9 @@ class FrontControllerSecurityTest extends WebTestCase
 
     public static function getSecureUrls(): \Generator
     {
-        // yield ['/login'];
         yield ['/admin'];
-        // yield ['/admin/videos'];
-        // yield ['/admin/su/categories'];
-        // yield ['/admin/su/delete_category/1'];
+        yield ['/admin/videos'];
+        yield ['/admin/su/categories'];
+        yield ['/admin/su/delete-category/1'];
     }
 }
