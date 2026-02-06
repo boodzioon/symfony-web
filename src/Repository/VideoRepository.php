@@ -62,6 +62,18 @@ class VideoRepository extends ServiceEntityRepository
         return $this->paginator->paginate($dbQuery, $page);
     }
 
+    public function getVideoDetails(int $id)
+    {
+        return $this->createQueryBuilder('v')
+            ->leftJoin('v.comments', 'c')
+            ->leftJoin('c.author', 'u')
+            ->addSelect('c', 'u')
+            ->where("v.id = :id")
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     private function prepareQuery(string $query)
     {
         return explode(' ', $query);

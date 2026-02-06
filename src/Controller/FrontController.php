@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Comment;
 use App\Entity\User;
 use App\Entity\Video;
+use App\Form\CommentType;
 use App\Form\UserType;
+use App\Repository\VideoRepository;
 use App\Utils\CategoryTreeFrontPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,9 +47,32 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/video-details/{id}', name: 'video_details')]
-    public function videoDetails(int $id): Response
+    public function videoDetails(VideoRepository $repository, int $id): Response
     {
-        return $this->render('front/video_details.html.twig', ['id' => $id]);
+        $video = $repository->getVideoDetails($id);
+
+        $comment = new Comment;
+        $form = $this->createForm(CommentType::class, $comment);
+
+        return $this->render('front/video_details.html.twig', ['video' => $video, 'form' => $form]);
+    }
+
+    #[Route('/new-comment/{video}', name: 'new_comment', methods: ['POST'])]
+    public function newComment(Video $video, EntityManagerInterface $em, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+        if (!empty(trim($request->request->all()['comment']))) {
+            $comment = new Comment;
+            $comment->setContent($request->request->all()['comment']);
+            $comment->setVideo($video);
+            $comment->setAuthor($this->getUser());
+
+            $em->persist($comment);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('video_details', ['id' => $video->getId()]);
     }
 
     #[Route('/search-results/{page?1}', name: 'search_results', methods: 'GET')]
