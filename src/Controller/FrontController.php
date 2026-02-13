@@ -23,6 +23,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 final class FrontController extends AbstractController
 {
 
+    public function __construct(private EntityManagerInterface $em) {}
+
     #[Route('/', name: 'main_page')]
     public function index(): Response
     {
@@ -30,13 +32,13 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/video-list/category/{categoryName},{id}/{page?1}', name: 'video_list')]
-    public function videoList(int $id, int $page, CategoryTreeFrontPage $categories, EntityManagerInterface $em, Request $request): Response
+    public function videoList(int $id, int $page, CategoryTreeFrontPage $categories, Request $request): Response
     {
         $categories->getCategoryListAndParent($id);
 
         $ids = $categories->getChildIds($id);
         $ids = [...$ids, $id];
-        $videos = $em->getRepository(Video::class)->findByChildIds($ids, $page, $request->query->get('sortby'));
+        $videos = $this->em->getRepository(Video::class)->findByChildIds($ids, $page, $request->query->get('sortby'));
 
         return $this->render('front/video_list.html.twig',
             [
@@ -58,7 +60,7 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/new-comment/{video}', name: 'new_comment', methods: ['POST'])]
-    public function newComment(Video $video, EntityManagerInterface $em, Request $request): Response
+    public function newComment(Video $video, Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 
@@ -68,22 +70,50 @@ final class FrontController extends AbstractController
             $comment->setVideo($video);
             $comment->setAuthor($this->getUser());
 
-            $em->persist($comment);
-            $em->flush();
+            $this->em->persist($comment);
+            $this->em->flush();
         }
 
         return $this->redirectToRoute('video_details', ['id' => $video->getId()]);
     }
 
+    #[Route('/like-video/{video}/like', name: 'like_video', methods: ['POST'])]
+    #[Route('/like-video/{video}/unlike', name: 'unlike_video', methods: ['POST'])]
+    #[Route('/dislike-video/{video}/dislike', name: 'dislike_video', methods: ['POST'])]
+    #[Route('/dislike-video/{video}/undodislike', name: 'undo_dislike_video', methods: ['POST'])]
+    public function toggleLikesAjax(Video $video, Request $request)
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        
+        switch ($request->attributes->get('_route')) {
+            case 'like_video':
+                $result = $this->likeVideo($video);
+                break;
+            case 'unlike_video':
+                $result = $this->unlikeVideo($video);
+                break;
+            case 'dislike_video':
+                $result = $this->dislikeVideo($video);
+                break;
+            case 'undo_dislike_video':
+                $result = $this->undoDislikeVideo($video);
+                break;
+            default:
+                break;
+        }
+
+        return $this->json(['action' => $result, 'id' => $video->getId()]);
+    }
+
     #[Route('/search-results/{page?1}', name: 'search_results', methods: 'GET')]
-    public function searchResults(int $page, Request $request, EntityManagerInterface $em): Response
+    public function searchResults(int $page, Request $request): Response
     {
         $videos = null;
         $query = null;
 
         if ($request->query->get('query') !== null && trim($request->query->get('query')) != '') {
             $query = $request->query->get('query');
-            $videos = $em->getRepository(Video::class)->findByTitle($query, $page, $request->query->get('sortby'));
+            $videos = $this->em->getRepository(Video::class)->findByTitle($query, $page, $request->query->get('sortby'));
         }
 
         return $this->render('front/search_results.html.twig',
@@ -123,7 +153,7 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/register', name: 'register')]
-    public function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordEncoder): Response
     {
         $user = new User;
         $form = $this->createForm(UserType::class, $user);
@@ -138,8 +168,8 @@ final class FrontController extends AbstractController
             $user->setPassword($password);
             $user->setRoles(['ROLE_USER']);
 
-            $em->persist($user);
-            $em->flush();
+            $this->em->persist($user);
+            $this->em->flush();
 
             $this->loginUserAutomatically($user, $password);
             return $this->redirectToRoute('admin_main_page');
@@ -160,9 +190,9 @@ final class FrontController extends AbstractController
         return $this->render('front/payment.html.twig');
     }
 
-    public function mainCategories(EntityManagerInterface $em): Response
+    public function mainCategories(): Response
     {
-        $categories = $em->getRepository(Category::class)->findBy(['parent' => null], ['name' => 'ASC']);
+        $categories = $this->em->getRepository(Category::class)->findBy(['parent' => null], ['name' => 'ASC']);
 
         return $this->render('front/_main_categories.html.twig', ['categories' => $categories]);
     }
@@ -173,5 +203,49 @@ final class FrontController extends AbstractController
 
         $this->container->get('security.token_storage')->setToken($token);
         $this->container->get('request_stack')->getSession()->set('_security_main', serialize($token));
+    }
+
+    private function likeVideo(Video $video)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $user->addLikedVideo($video);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return 'liked';
+    }
+
+    private function unlikeVideo(Video $video)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $user->removeLikedVideo($video);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return 'undo liked';
+    }
+
+    private function dislikeVideo(Video $video)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $user->addDislikedVideo($video);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return 'disliked';
+    }
+
+    private function undoDislikeVideo(Video $video)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $user->removeDislikedVideo($video);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return 'undo disliked';
     }
 }

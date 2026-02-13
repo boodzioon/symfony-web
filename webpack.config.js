@@ -21,10 +21,12 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addStyleEntry('css/dashboard', ['./assets/css/dashboard.css'])
+    .addStyleEntry('css/likes', ['./assets/css/likes.css'])
     .addStyleEntry('css/login', ['./assets/css/login.css'])
     .addStyleEntry('css/styles', ['./assets/css/styles.css'])
     .addStyleEntry('css/fontawesome.min', ['./assets/css/fontawesome.min.css'])
-    // .addEntry('app', './assets/app.js')
+
+    .addEntry('js/likes', './assets/js/likes.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
