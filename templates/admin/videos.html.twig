@@ -31,7 +31,7 @@
           <td>
               <form action="#" method="POST">
                   <select onchange="this.form.submit();">
-                    {{ render(controller('App\\Controller\\AdminController::getAllCategories', {'editedCategory': video.category})) }}
+                    {{ render(controller('App\\Controller\\Admin\\MainController::getAllCategories', {'editedCategory': video.category})) }}
                   </select>
               </form>
           </td>
