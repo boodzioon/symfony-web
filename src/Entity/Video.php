@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\VideoRepository;
+use App\Utils\VideoForNoValidSubscribtions;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,7 +15,7 @@ class Video
 {
 
     public const VimeoPath = 'https://player.vimeo.com/video/';
-    public const videoForNotLoggedIn = '113716040';
+    public const videoForNotLoggedInOrNoMembers = '113716040';
     public const perPage = 5;
 
     #[ORM\Id]
@@ -144,13 +145,9 @@ class Video
         return $this;
     }
 
-    public function getVimeoPath($user)
+    public function getVimeoPath()
     {
-        if ($user) {
-            return $this->getPath();
-        } else {
-            return self::VimeoPath . self::videoForNotLoggedIn;
-        }
+        return $this->getPath();
     }
 
     /**

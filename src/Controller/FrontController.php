@@ -9,6 +9,7 @@ use App\Entity\Video;
 use App\Form\CommentType;
 use App\Repository\VideoRepository;
 use App\Utils\CategoryTreeFrontPage;
+use App\Utils\VideoForNoValidSubscribtions;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +29,7 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/video-list/category/{categoryName},{id}/{page?1}', name: 'video_list')]
-    public function videoList(int $id, int $page, CategoryTreeFrontPage $categories, Request $request): Response
+    public function videoList(int $id, int $page, CategoryTreeFrontPage $categories, Request $request, VideoForNoValidSubscribtions $videoNoMembers): Response
     {
         $categories->getCategoryListAndParent($id);
 
@@ -39,20 +40,27 @@ final class FrontController extends AbstractController
         return $this->render('front/video_list.html.twig',
             [
                 'subcategories' => $categories,
-                'videos' => $videos
+                'videos' => $videos,
+                'video_no_members' => $videoNoMembers->check()
             ]
         );
     }
 
     #[Route('/video-details/{id}', name: 'video_details')]
-    public function videoDetails(VideoRepository $repository, int $id): Response
+    public function videoDetails(VideoRepository $repository, int $id, VideoForNoValidSubscribtions $videoNoMembers): Response
     {
         $video = $repository->getVideoDetails($id);
 
         $comment = new Comment;
         $form = $this->createForm(CommentType::class, $comment);
 
-        return $this->render('front/video_details.html.twig', ['video' => $video, 'form' => $form]);
+        return $this->render('front/video_details.html.twig',
+            [
+                'video' => $video,
+                'form' => $form,
+                'video_no_members' => $videoNoMembers->check()
+            ]
+        );
     }
 
     #[Route('/new-comment/{video}', name: 'new_comment', methods: ['POST'])]
@@ -102,7 +110,7 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/search-results/{page?1}', name: 'search_results', methods: 'GET')]
-    public function searchResults(int $page, Request $request): Response
+    public function searchResults(int $page, Request $request, VideoForNoValidSubscribtions $videoNoMembers): Response
     {
         $videos = null;
         $query = null;
@@ -115,21 +123,10 @@ final class FrontController extends AbstractController
         return $this->render('front/search_results.html.twig',
             [
                 'videos' => $videos,
-                'query' => $query
+                'query' => $query,
+                'video_no_members' => $videoNoMembers->check()
             ]
         );
-    }
-
-    #[Route('/pricing', name: 'pricing')]
-    public function pricing(): Response
-    {
-        return $this->render('front/pricing.html.twig');
-    }
-
-    #[Route('/payment', name: 'payment')]
-    public function payment(): Response
-    {
-        return $this->render('front/payment.html.twig');
     }
 
     public function mainCategories(): Response

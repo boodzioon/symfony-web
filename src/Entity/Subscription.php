@@ -92,13 +92,18 @@ class Subscription
         return self::$planDataNames;
     }
 
+    public static function getPlanDataPrices(): array
+    {
+        return self::$planDataPrices;
+    }
+
     public static function getPlanDataNameByIndex(int $index): string
     {
-        return self::$planDataNames[$index];
+        return self::getPlanDataNames()[$index];
     }
 
     public static function getPlanDataPriceByName(string $name): int
     {
-        return self::$planDataPrices[$name];
+        return self::getPlanDataPrices()[$name];
     }
 }

@@ -22,7 +22,7 @@
         </div>
     </section>  
     {% if videos and videos.count %}
-        {{ include('front/includes/_videos.html.twig', {'videos' : videos}) }}
+        {{ include('front/includes/_videos.html.twig', {'videos' : videos, 'video_no_members' : video_no_members}) }}
         {{ knp_pagination_render(videos) }}
     {% endif %}
 </main>
