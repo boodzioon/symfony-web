@@ -2,26 +2,22 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\Likes;
 use App\Entity\Category;
 use App\Entity\Comment;
-use App\Entity\User;
 use App\Entity\Video;
 use App\Form\CommentType;
-use App\Form\UserType;
 use App\Repository\VideoRepository;
 use App\Utils\CategoryTreeFrontPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class FrontController extends AbstractController
 {
+    use Likes;
 
     public function __construct(private EntityManagerInterface $em) {}
 
@@ -77,10 +73,10 @@ final class FrontController extends AbstractController
         return $this->redirectToRoute('video_details', ['id' => $video->getId()]);
     }
 
-    #[Route('/like-video/{video}/like', name: 'like_video', methods: ['POST'])]
-    #[Route('/like-video/{video}/unlike', name: 'unlike_video', methods: ['POST'])]
-    #[Route('/dislike-video/{video}/dislike', name: 'dislike_video', methods: ['POST'])]
-    #[Route('/dislike-video/{video}/undodislike', name: 'undo_dislike_video', methods: ['POST'])]
+    #[Route('/video-list/{video}/like', name: 'like_video', methods: ['POST'])]
+    #[Route('/video-list/{video}/unlike', name: 'unlike_video', methods: ['POST'])]
+    #[Route('/video-list/{video}/dislike', name: 'dislike_video', methods: ['POST'])]
+    #[Route('/video-list/{video}/undodislike', name: 'undo_dislike_video', methods: ['POST'])]
     public function toggleLikesAjax(Video $video, Request $request)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -130,60 +126,6 @@ final class FrontController extends AbstractController
         return $this->render('front/pricing.html.twig');
     }
 
-    #[Route('/login', name: 'login')]
-    public function login(AuthenticationUtils $helper, CsrfTokenManagerInterface $csrfTokenManager): Response
-    {
-        $token = $csrfTokenManager->getToken('authenticate');
-
-        $response = $this->render('front/login.html.twig',
-            [
-                'last_name' => $helper->getLastUsername(),
-                'error' => $helper->getLastAuthenticationError()
-            ]
-        );
-        $response->headers->set('Turbo-Cache-Control', 'no-cache');
-
-        return $response;
-    }
-
-    #[Route('/logout', name: 'logout')]
-    public function logout(): void
-    {
-        throw new \Exception('This should never be reached!');
-    }
-
-    #[Route('/register', name: 'register')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordEncoder): Response
-    {
-        $user = new User;
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
-
-        $isInvalid = null;
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user->setName($request->request->all('user')['name']);
-            $user->setLastName($request->request->all('user')['last_name']);
-            $user->setEmail($request->request->all('user')['email']);
-            $password = $passwordEncoder->hashPassword($user, $request->request->all('user')['password']['first']);
-            $user->setPassword($password);
-            $user->setRoles(['ROLE_USER']);
-
-            $this->em->persist($user);
-            $this->em->flush();
-
-            $this->loginUserAutomatically($user, $password);
-            return $this->redirectToRoute('admin_main_page');
-        } elseif ($request->isMethod('POST')) {
-            $isInvalid = ' is-invalid';
-        }
-
-        return $this->render('front/register.html.twig',
-            [
-                'form' => $form
-            ]
-        );
-    }
-
     #[Route('/payment', name: 'payment')]
     public function payment(): Response
     {
@@ -197,55 +139,4 @@ final class FrontController extends AbstractController
         return $this->render('front/_main_categories.html.twig', ['categories' => $categories]);
     }
 
-    private function loginUserAutomatically(User $user, string $password)
-    {
-        $token = new UsernamePasswordToken($user, $password, $user->getRoles());
-
-        $this->container->get('security.token_storage')->setToken($token);
-        $this->container->get('request_stack')->getSession()->set('_security_main', serialize($token));
-    }
-
-    private function likeVideo(Video $video)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $user->addLikedVideo($video);
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return 'liked';
-    }
-
-    private function unlikeVideo(Video $video)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $user->removeLikedVideo($video);
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return 'undo liked';
-    }
-
-    private function dislikeVideo(Video $video)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $user->addDislikedVideo($video);
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return 'disliked';
-    }
-
-    private function undoDislikeVideo(Video $video)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $user->removeDislikedVideo($video);
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return 'undo disliked';
-    }
 }

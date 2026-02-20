@@ -2,14 +2,13 @@
 
 namespace App\Tests\Front;
 
-use App\Tests\Rollback;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use App\Tests\RoleUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class FrontControllerCommentsTest extends WebTestCase
 {
 
-    use Rollback;
+    use RoleUser;
 
     public function testNotLoggedInUser(): void
     {

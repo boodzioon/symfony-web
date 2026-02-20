@@ -2,7 +2,7 @@
 
 namespace App\Tests;
 
-trait Rollback
+trait RoleUser
 {
 
     private $client;
@@ -12,7 +12,7 @@ trait Rollback
     {
         parent::setUp();
         $this->client = static::createClient([], [
-            'PHP_AUTH_USER' => 'jw@symf8.loc',
+            'PHP_AUTH_USER' => 'bn@symf8.loc',
             'PHP_AUTH_PW' => 'pass'
         ]);
         $this->client->disableReboot();

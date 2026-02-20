@@ -1,31 +1,23 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin\SuperAdmin;
 
 use App\Entity\Category;
-use App\Entity\User;
 use App\Form\CategoryType;
 use App\Utils\CategoryTreeAdminList;
-use App\Utils\CategoryTreeAdminOptionList;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin')]
-final class AdminController extends AbstractController
+#[Route('/admin/su')]
+final class CategoriesController extends AbstractController
 {
 
     public function __construct(private EntityManagerInterface $em) {}
 
-    #[Route('/', name: 'admin_main_page')]
-    public function index(): Response
-    {
-        return $this->render('admin/my_profile.html.twig');
-    }
-
-    #[Route('/su/categories', name: 'admin_categories', methods: ['GET', 'POST'])]
+    #[Route('/categories', name: 'admin_categories', methods: ['GET', 'POST'])]
     public function categories(CategoryTreeAdminList $categories, Request $request): Response
     {
         $categories->getCategoryList($categories->buildTree());
@@ -50,7 +42,7 @@ final class AdminController extends AbstractController
         );
     }
 
-    #[Route('/su/edit-category/{id}', name: 'admin_edit_category')]
+    #[Route('/edit-category/{id}', name: 'admin_edit_category')]
     public function editCategory(Category $category, Request $request): Response
     {
         $form = $this->createForm(CategoryType::class, $category);
@@ -69,45 +61,13 @@ final class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/su/delete-category/{id}', name: 'admin_delete_category')]
+    #[Route('/delete-category/{id}', name: 'admin_delete_category')]
     public function deleteCategory(Category $category): Response
     {
         $this->em->remove($category);
         $this->em->flush();
 
         return $this->redirectToRoute('admin_categories');
-    }
-
-    #[Route('/su/users', name: 'admin_users')]
-    public function users(): Response
-    {
-        $users = $this->em->getRepository(User::class)->findBy([], ['last_name' => 'ASC', 'name' => 'ASC']);
-
-        return $this->render('admin/users.html.twig', ['users' => $users]);
-    }
-
-    #[Route('/videos', name: 'admin_videos')]
-    public function videos(): Response
-    {
-        return $this->render('admin/videos.html.twig');
-    }
-
-    #[Route('/su/upload-video', name: 'admin_upload_video')]
-    public function uploadVideo(): Response
-    {
-        return $this->render('admin/upload_video.html.twig');
-    }
-
-    public function getAllCategories(CategoryTreeAdminOptionList $categories, $editedCategory = null): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-        $categories->getCategoryList($categories->buildTree());
-
-        return $this->render('admin/_all_categories.html.twig', [
-            'categories' => $categories,
-            'editedCategory' => $editedCategory
-        ]);
     }
 
     private function saveCategory($category, $form, $request)

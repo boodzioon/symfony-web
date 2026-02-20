@@ -22,21 +22,16 @@
       </tr>
     </thead>
     <tbody>
-      {% for i in 1..10 %}
+      {% for video in videos %}
       <tr>
-        <td>{{i}}</td>
-        <td>Video name</td>
-        <td><a target="_blank" href="https://player.vimeo.com/video/{id}">go to video</a></td>
+        <td>{{loop.index}}</td>
+        <td>{{video.title}}</td>
+        <td><a target="_blank" href="{{path('video_details', {id: video.id}) }}">go to video</a></td>
         {% if is_granted('ROLE_ADMIN') %}
           <td>
               <form action="#" method="POST">
                   <select onchange="this.form.submit();">
-                  <option selected>Parent...</option>
-                  <option value="1">Funny</option>
-                  <option value="1">--For kids</option>
-                  <option value="1">----For adults</option>
-                  <option value="2">Scary</option>
-                  <option value="3">Motivating</option>
+                    {{ render(controller('App\\Controller\\AdminController::getAllCategories', {'editedCategory': video.category})) }}
                   </select>
               </form>
           </td>
