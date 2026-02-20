@@ -18,7 +18,27 @@ final class MainController extends AbstractController
     #[Route('/', name: 'admin_main_page')]
     public function index(): Response
     {
-        return $this->render('admin/my_profile.html.twig');
+        /** @var User $this->getUser() */
+        return $this->render('admin/my_profile.html.twig', [
+            'subscription' => $this->getUser()->getSubscription()
+        ]);
+    }
+
+    #[Route('/cancel-plan', name: 'cancel_plan')]
+    public function cancelPlan(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $subscription = $user->getSubscription();
+        $subscription->setValidTo(new \DateTime());
+        $subscription->setPaymentStatus(null);
+        $subscription->setPlan('canceled');
+
+        $this->em->persist($subscription);
+        $this->em->flush();
+
+        return $this->redirectToRoute('admin_main_page');
     }
 
     #[Route('/videos', name: 'admin_videos')]

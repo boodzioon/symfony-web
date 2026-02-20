@@ -61,6 +61,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Video::class, mappedBy: 'usersThatDontLike')]
     private Collection $dislikedVideos;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private ?Subscription $subscription = null;
+
     public function __construct()
     {
         $this->likedVideos = new ArrayCollection();
@@ -228,6 +231,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->dislikedVideos->removeElement($dislikedVideo)) {
             $dislikedVideo->removeUserThatDontLike($this);
         }
+
+        return $this;
+    }
+
+    public function getSubscription(): ?Subscription
+    {
+        return $this->subscription;
+    }
+
+    public function setSubscription(?Subscription $subscription): static
+    {
+        $this->subscription = $subscription;
 
         return $this;
     }
