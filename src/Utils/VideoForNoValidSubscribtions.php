@@ -4,7 +4,6 @@ namespace App\Utils;
 
 use App\Entity\User;
 use App\Entity\Video;
-use DateTime;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class VideoForNoValidSubscribtions
@@ -19,7 +18,7 @@ class VideoForNoValidSubscribtions
 
         if ($user && $user->getSubscription() != null) {
             $paymentStatus = $user->getSubscription()->getPaymentStatus();
-            $valid = new DateTime() < $user->getSubscription()->getValidTo();
+            $valid = new \DateTime() < $user->getSubscription()->getValidTo();
 
             if ($paymentStatus != null && $valid) {
                 $this->isSubscriptionValid = true;

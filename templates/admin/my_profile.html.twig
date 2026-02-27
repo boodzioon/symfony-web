@@ -6,7 +6,7 @@
 <p class="text-left">
     My plan - {{ subscription.plan|upper }}, <b>valid to: </b> {{subscription.validTo|date('Y-m-d')}}
     {% if subscription.validTo == null or subscription.paymentStatus == null %}
-        | Plan is not active, <a href="path('payment')">pay for plan</a>
+        | Plan is not active, <a href="{{path('payment', {'plan': subscription.getPlan}) }}">pay for plan</a>
     {% endif %}
     {% if subscription.getPlan == subscription.getPlanDataNameByIndex(0) %}
         | <a href="{{path('payment')}}">Get paid plan</a>
