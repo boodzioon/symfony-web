@@ -2,11 +2,13 @@
 
 namespace App\Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 trait RoleAdmin
 {
 
     private $client;
-    private $em;
+    private ?EntityManagerInterface $em;
 
     public function setUp(): void
     {

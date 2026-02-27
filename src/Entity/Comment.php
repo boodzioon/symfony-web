@@ -26,11 +26,11 @@ class Comment
     private ?\DateTime $created_at2;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, name: 'author_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, name: 'video_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?Video $video = null;
 
     public function getId(): ?int
