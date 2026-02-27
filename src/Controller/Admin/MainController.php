@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[Route('/admin')]
 final class MainController extends AbstractController
@@ -29,7 +30,7 @@ final class MainController extends AbstractController
 
         $isInvalid = null;
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($request->request->all('user')['vimeo_api_key']) {
+            if (array_key_exists('vimeo_api_key', $request->request->all('user'))) {
                 $user->setVimeoApiKey($request->request->all('user')['vimeo_api_key']);
             }
             $user->setName($request->request->all('user')['name']);
@@ -66,7 +67,9 @@ final class MainController extends AbstractController
 
         $this->em->remove($user);
         $this->em->flush();
-        session_destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
 
         return $this->redirectToRoute('main_page');
     }

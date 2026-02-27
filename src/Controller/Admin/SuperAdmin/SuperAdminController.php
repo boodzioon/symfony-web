@@ -22,6 +22,15 @@ final class SuperAdminController extends AbstractController
         return $this->render('admin/users.html.twig', ['users' => $users]);
     }
 
+    #[Route('/delete-user/{user}', name: 'admin_delete_user')]
+    public function deleteUser(User $user): Response
+    {
+        $this->em->remove($user);
+        $this->em->flush();
+
+        return $this->redirectToRoute('admin_users');
+    }
+
     #[Route('/upload-video', name: 'admin_upload_video')]
     public function uploadVideo(): Response
     {
