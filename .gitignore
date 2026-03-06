@@ -1,6 +1,7 @@
 /.editorconfig
 /.env*
 !/.env.sample
+/public/uploads/
 
 ###> symfony/framework-bundle ###
 /.env.local
