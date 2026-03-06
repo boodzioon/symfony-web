@@ -12,9 +12,11 @@ use App\Utils\CategoryTreeFrontPage;
 use App\Utils\VideoForNoValidSubscribtions;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class FrontController extends AbstractController
 {
@@ -77,6 +79,26 @@ final class FrontController extends AbstractController
             $this->em->persist($comment);
             $this->em->flush();
         }
+
+        return $this->redirectToRoute('video_details', ['id' => $video->getId()]);
+    }
+
+    #[Route('/delete-comment/{comment}', name: 'delete_comment')]
+    #[IsGranted(
+        attribute: new Expression('user == subject'),
+        subject: new Expression('args["comment"].getAuthor()')
+    )]
+    public function deleteComment(Comment $comment, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $video = $comment->getVideo();
+
+        $this->em->remove($comment);
+        $this->em->flush();
+        $this->addFlash(
+            'success',
+            'Komentarz usunięty.'
+        );
 
         return $this->redirectToRoute('video_details', ['id' => $video->getId()]);
     }

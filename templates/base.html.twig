@@ -49,6 +49,13 @@
 					{% endif %}
 				</div>
 			{% endblock %}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{label}}" role="alert">
+                        {{message}}
+                    </div>
+                {% endfor %}
+            {% endfor %}
 			{% block main %}{% endblock %}
 			{% block footerlinks %}
 				<footer class="pt-4 my-md-5 pt-md-5 border-top">
