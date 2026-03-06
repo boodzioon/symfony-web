@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin\SuperAdmin;
 
+use App\Entity\Category;
 use App\Entity\User;
 use App\Entity\Video;
 use App\Form\VideoType;
@@ -84,6 +85,19 @@ final class SuperAdminController extends AbstractController
         } else {
             $this->addFlash('danger', 'We were not able to delete. Check the video.');
         }
+
+        return $this->redirectToRoute('admin_videos');
+    }
+
+    #[Route('/update-video-category/{video}', name: 'admin_update_video_category', methods: ['POST'] )]
+    public function updateVideoCategory(Request $request, Video $video): Response
+    {
+        $newCategoryId = $request->request->all()['video_category'];
+        $category = $this->em->getRepository(Category::class)->find($newCategoryId);
+
+        $video->setCategory($category);
+        $this->em->persist($video);
+        $this->em->flush();
 
         return $this->redirectToRoute('admin_videos');
     }

@@ -29,9 +29,21 @@
         <td><a target="_blank" href="{{path('video_details', {id: video.id}) }}">go to video</a></td>
         {% if is_granted('ROLE_ADMIN') %}
           <td>
-              <form action="#" method="POST">
-                  <select onchange="this.form.submit();">
-                    {{ render(controller('App\\Controller\\Admin\\MainController::getAllCategories', {'editedCategory': video.category})) }}
+              <form action="{{ path('admin_update_video_category', {video: video.id} ) }}" method="POST">
+                  <select name="video_category" onchange="this.form.submit();">
+                    {% if video.category is null %}
+                      <option selected value="0">No category</option>
+                      {% else %}
+                        <option value="0">No category</option>
+                    {% endif %}
+
+                    {% for category in categories.categoryList %}
+                      {% if video.category is not null and video.category.id == category.id %}
+                        <option selected value="{{ category.id }}">{{ category.name }}</option>
+                      {% else %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                      {% endif %}
+                    {% endfor %}
                   </select>
               </form>
           </td>
