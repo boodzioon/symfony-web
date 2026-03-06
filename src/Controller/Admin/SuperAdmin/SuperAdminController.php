@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/admin/su')]
@@ -108,5 +109,68 @@ final class SuperAdminController extends AbstractController
         $this->em->flush();
 
         return $this->redirectToRoute('admin_videos');
+    }
+
+    #[Route('/set-video-duration/{video}/{vimeo_id}', name: 'admin_set_video_duration', requirements: ['vimeo_id' => '.+'] )]
+    public function setVideoDuration(Video $video, $vimeo_id): Response
+    {
+        if( !is_numeric($vimeo_id) )
+        {
+            // you can handle here setting duration for locally stored files
+            // ....
+            return $this->redirectToRoute('videos');
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+        $user_vimeo_token = $user->getVimeoApiKey();
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.vimeo.com/videos/{$vimeo_id}",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Accept: application/vnd.vimeo.*+json;version=3.4",
+                "Authorization: Bearer $user_vimeo_token",
+                "Cache-Control: no-cache",
+                "Content-Type: application/x-www-form-urlencoded"
+            ),
+        ));
+        
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err)
+        {
+            throw new ServiceUnavailableHttpException('Error. Try again later. Message: '.$err);
+        } 
+        else
+        {
+            $duration =  json_decode($response, true)['duration'] / 60;
+
+            if($duration)
+            {
+                $video->setDuration($duration);
+                $this->em->persist($video);
+                $this->em->flush();
+            }
+            else
+            {
+                $this->addFlash(
+                    'danger',
+                    'We were not able to update duration. Check the video.'
+                );
+            }
+
+            return $this->redirectToRoute('videos');
+        }
+
     }
 }
