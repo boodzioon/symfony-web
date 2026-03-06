@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\User;
 use App\Entity\Video;
 use App\Form\UserType;
 use App\Utils\CategoryTreeAdminOptionList;
@@ -12,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[Route('/admin')]
 final class MainController extends AbstractController
@@ -51,9 +51,8 @@ final class MainController extends AbstractController
             $this->addFlash('error', 'Error!');
         }
 
-        /** @var User $this->getUser() */
         return $this->render('admin/my_profile.html.twig', [
-            'subscription' => $this->getUser()->getSubscription(),
+            'subscription' => $user->getSubscription(),
             'form' => $form->createView(),
             'is_invalid' => $isInvalid
         ]);
@@ -62,7 +61,6 @@ final class MainController extends AbstractController
     #[Route('/delete-account', name: 'admin_delete_account')]
     public function deleteAccount(SessionInterface $session): Response
     {
-        /** @var User $this->getUser() */
         $user = $this->getUser();
 
         $this->em->remove($user);
