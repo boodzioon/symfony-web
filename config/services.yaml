@@ -7,6 +7,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    locale: 'en'
+    videos_directory: '%kernel.project_dir%/public/uploads/videos'
 
 services:
     # default configuration for services in *this* file
@@ -31,3 +33,10 @@ services:
             - connect:
                 - '%env(REDIS_HOST)%'
                 - '%env(int:REDIS_PORT)%'
+
+    App\Utils\Interfaces\UploaderInterface:
+        alias: App\Utils\LocalUploader
+
+    App\Utils\LocalUploader:
+        arguments: 
+            $targetDirectory: '%videos_directory%'

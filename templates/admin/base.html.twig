@@ -45,7 +45,7 @@
                         </li>
                         {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{path('admin_upload_video')}}">
+                            <a class="nav-link" href="{{path(upload_route_name)}}">
                                 <span data-feather="shopping-cart"></span>
                                 Upload a video
                             </a>
@@ -68,6 +68,15 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><a href="{{ path('admin_main_page') }}">Dashboard</a></h1>
                 </div>
+
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{label}}" role="alert">
+                            {{message}}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
                 {% block mainadmin %}{% endblock %}
             </main>
         </div>

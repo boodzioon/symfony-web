@@ -7,6 +7,7 @@ use App\Utils\VideoForNoValidSubscribtions;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
 #[ORM\Table(name: "videos")]
@@ -17,6 +18,7 @@ class Video
     public const VimeoPath = 'https://player.vimeo.com/video/';
     public const videoForNotLoggedInOrNoMembers = '113716040';
     public const perPage = 5;
+    public const uploadFolder = '/uploads/videos/';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -54,6 +56,11 @@ class Video
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'dislikedVideos')]
     #[ORM\JoinTable(name: 'dislikes')]
     private Collection $usersThatDontLike;
+
+    // #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Please, upload the video as a MP4 file.')]
+    #[Assert\File(mimeTypes: ['video/mp4'])]
+    private $uploaded_video = null;
 
     public function __construct()
     {
@@ -194,6 +201,18 @@ class Video
     public function removeUserThatDontLike(User $usersThatDontLike): static
     {
         $this->usersThatDontLike->removeElement($usersThatDontLike);
+
+        return $this;
+    }
+
+    public function getUploadedVideo()
+    {
+        return $this->uploaded_video;
+    }
+
+    public function setUploadedVideo($uploaded_video): static
+    {
+        $this->uploaded_video = $uploaded_video;
 
         return $this;
     }
