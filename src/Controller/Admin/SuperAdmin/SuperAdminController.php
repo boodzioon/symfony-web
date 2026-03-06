@@ -65,13 +65,21 @@ final class SuperAdminController extends AbstractController
     #[Route('/upload-video-vimeo', name: 'admin_upload_video_to_vimeo')]
     public function uploadVideoToVimeo(Request $request, VimeoUploader $fileUploader): Response
     {
-        $video = new Video;
-        $form = $this->createForm(VideoType::class, $video);
-        $form->handleRequest($request);
+        $vimeo_id = preg_replace('/^\/.+\//', '', $request->attributes->get('video_uri'));
 
-        return $this->render('admin/upload_video.html.twig', [
-            'form' => $form->createView()
-        ]);
+        if($request->attributes->get('videoName') && $vimeo_id)
+        {
+            $video = new Video();
+            $video->setTitle($request->attributes->get('videoName'));
+            $video->setPath(Video::VimeoPath . $vimeo_id);
+
+            $this->em->persist($video);
+            $this->em->flush();
+
+            return $this->redirectToRoute('videos');
+        }
+
+        return $this->render('admin/upload_video_vimeo.html.twig');
     }
 
     #[Route('/delete-video/{video}/{path}', name: 'admin_delete_video', requirements: ['path' => ".+"] )]

@@ -17,7 +17,7 @@
     <p class="text-left">You don't have any plan. <a href="{{path('pricing')}}">Get Plan.</a></p>
 {% endif %}
 
-{{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }}
+{{ form_start(form, {'attr': {'class': 'needs-validation'} }) }}
     {% if is_granted('ROLE_ADMIN') %}
     <div class="form-group">
         <label for="user_vimeo_api_key">Vimeo API key</label>
@@ -50,14 +50,14 @@
     </div>
     <div class="form-group">
         <label for="user_password_first">Password</label>
-        {{ form_widget(form.password.first, {'attr':{'class': is_invalid}} ) }}
+        {{ form_widget(form.password.first, {'attr':{'class': is_invalid, 'required': 'required'}} ) }}
         <div class="invalid-feedback">
             {{ form_errors(form.password.first) }}
         </div>
     </div>
     <div class="form-group">
         <label for="user_password_second">Confirm password</label>
-        {{ form_widget(form.password.second, {'attr':{'class': is_invalid}} ) }}
+        {{ form_widget(form.password.second, {'attr':{'class': is_invalid, 'required': 'required'}} ) }}
         <div class="invalid-feedback">
             {{ form_errors(form.password.second) }}
         </div>

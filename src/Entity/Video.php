@@ -16,7 +16,8 @@ class Video
 {
 
     public const VimeoPath = 'https://player.vimeo.com/video/';
-    public const videoForNotLoggedInOrNoMembers = '113716040';
+    // public const videoForNotLoggedInOrNoMembers = '113716040';
+    public const videoForNotLoggedInOrNoMembers = 'https://player.vimeo.com/video/113716040';
     public const perPage = 5;
     public const uploadFolder = '/uploads/videos/';
 
@@ -152,9 +153,15 @@ class Video
         return $this;
     }
 
-    public function getVimeoPath()
+    public function getVimeoId()
     {
-        return $this->getPath();
+        if (strpos($this->getPath(), self::uploadFolder) !== false)
+        {
+            return $this->getPath();
+        }
+
+        $array = explode('/', $this->getPath());
+        return end($array);
     }
 
     /**

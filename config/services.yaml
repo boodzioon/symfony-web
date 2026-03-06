@@ -34,8 +34,7 @@ services:
                 - '%env(REDIS_HOST)%'
                 - '%env(int:REDIS_PORT)%'
 
-    App\Utils\Interfaces\UploaderInterface:
-        alias: App\Utils\LocalUploader
+    App\Utils\Interfaces\UploaderInterface: '@App\Utils\LocalUploader'
 
     App\Utils\LocalUploader:
         arguments: 
