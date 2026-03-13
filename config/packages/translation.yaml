@@ -1,5 +1,8 @@
 framework:
     default_locale: pl
+    enabled_locales: ['en', 'pl']
     translator:
         default_path: '%kernel.project_dir%/translations'
+        globals:
+            '{app_version}': '0.0.1'
         providers:

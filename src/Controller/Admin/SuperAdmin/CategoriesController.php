@@ -18,9 +18,10 @@ final class CategoriesController extends AbstractController
 
     public function __construct(private EntityManagerInterface $em) {}
 
-    #[Route('/categories', name: 'admin_categories', methods: ['GET', 'POST'])]
+    #[Route(path: ["pl" => "/kategorie", "en" => "/categories"], name: 'admin_categories', methods: ['GET', 'POST'])]
     public function categories(CategoryTreeAdminList $categories, Request $request): Response
     {
+        dump($request->getLocale());
         $categories->getCategoryList($categories->buildTree());
 
         $category = new Category;
@@ -43,7 +44,7 @@ final class CategoriesController extends AbstractController
         );
     }
 
-    #[Route('/edit-category/{id}', name: 'admin_edit_category')]
+    #[Route(path: ['pl' => '/edytuj-kategorie/{id}', 'en' => '/edit-category/{id}'], name: 'admin_edit_category')]
     public function editCategory(Category $category, Request $request): Response
     {
         $form = $this->createForm(CategoryType::class, $category);

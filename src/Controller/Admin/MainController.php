@@ -13,12 +13,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/admin')]
 final class MainController extends AbstractController
 {
 
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em, private TranslatorInterface $translator) {}
 
     #[Route('/', name: 'admin_main_page')]
     public function index(Request $request, UserPasswordHasherInterface $passwordEncoder): Response
@@ -44,7 +45,7 @@ final class MainController extends AbstractController
             $this->em->persist($user);
             $this->em->flush();
 
-            $this->addFlash('success', 'Your changes were saved!');
+            $this->addFlash('success', $this->translator->trans('Your changes were saved!'));
             $this->redirectToRoute('admin_main_page');
         } elseif ($request->isMethod('POST')) {
             $isInvalid = ' is-invalid';
@@ -89,7 +90,7 @@ final class MainController extends AbstractController
         return $this->redirectToRoute('admin_main_page');
     }
 
-    #[Route('/videos', name: 'admin_videos')]
+    #[Route(path: ["pl" => "/lista-wideo", "en" => "/videos"], name: 'admin_videos')]
     public function videos(CategoryTreeAdminOptionList $categories): Response
     {
         if ($this->isGranted('ROLE_ADMIN')) {

@@ -34,11 +34,8 @@ class NewVideoListener
                 ->to($user->getEmail())
                 ->subject('New Video');
 
-            $$this->mailer->send($email);
-            dump($email);
+            $this->mailer->send($email);
         }
-
-        die();
     }
 
     private function generateTemplatedEmail($entity, $user)

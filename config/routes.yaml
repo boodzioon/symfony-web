@@ -8,4 +8,10 @@
 #   bin/console debug:router
 
 controllers:
+    prefix:
+        en: ''
+        pl: '/pl'
+    # host:
+    #     en: en.symfony-web.loc
+    #     pl: pl.symfony-web.loc
     resource: routing.controllers
