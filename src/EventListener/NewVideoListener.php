@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace App\EventListener;
 
 use App\Entity\User;
 use App\Entity\Video;

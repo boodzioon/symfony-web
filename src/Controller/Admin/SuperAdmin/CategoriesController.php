@@ -21,7 +21,6 @@ final class CategoriesController extends AbstractController
     #[Route(path: ["pl" => "/kategorie", "en" => "/categories"], name: 'admin_categories', methods: ['GET', 'POST'])]
     public function categories(CategoryTreeAdminList $categories, Request $request): Response
     {
-        dump($request->getLocale());
         $categories->getCategoryList($categories->buildTree());
 
         $category = new Category;

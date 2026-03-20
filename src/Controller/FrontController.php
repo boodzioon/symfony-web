@@ -9,6 +9,7 @@ use App\Entity\Video;
 use App\Form\CommentType;
 use App\Repository\VideoRepository;
 use App\Utils\CategoryTreeFrontPage;
+use App\Utils\Interfaces\CacheInterface;
 use App\Utils\VideoForNoValidSubscribtions;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,21 +32,31 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/video-list/category/{categoryName},{id}/{page?1}', name: 'video_list')]
-    public function videoList(int $id, int $page, CategoryTreeFrontPage $categories, Request $request, VideoForNoValidSubscribtions $videoNoMembers): Response
+    public function videoList(int $id, int $page, CategoryTreeFrontPage $categories, Request $request, VideoForNoValidSubscribtions $videoNoMembers, CacheInterface $cache): Response
     {
-        $categories->getCategoryListAndParent($id);
+        $cache = $cache->cache;
+        $videosList = $cache->getItem('video_list' . $id . '_' . $page . $request->query->get('sortby'));
+        $videosList->expiresAfter(60);
+        if (!$videosList->isHit()) {
+        // if (true) {
+            $categories->getCategoryListAndParent($id);
 
-        $ids = $categories->getChildIds($id);
-        $ids = [...$ids, $id];
-        $videos = $this->em->getRepository(Video::class)->findByChildIds($ids, $page, $request->query->get('sortby'));
+            $ids = $categories->getChildIds($id);
+            $ids = [...$ids, $id];
+            $videos = $this->em->getRepository(Video::class)->findByChildIds($ids, $page, $request->query->get('sortby'));
 
-        return $this->render('front/video_list.html.twig',
-            [
-                'subcategories' => $categories,
-                'videos' => $videos,
-                'video_no_members' => $videoNoMembers->check()
-            ]
-        );
+            $response = $this->render('front/video_list.html.twig',
+                [
+                    'subcategories' => $categories,
+                    'videos' => $videos,
+                    'video_no_members' => $videoNoMembers->check()
+                ]
+            );
+            $videosList->set($response);
+            $cache->save($videosList);
+        }
+
+        return $videosList->get();
     }
 
     #[Route('/video-details/{id}', name: 'video_details')]
