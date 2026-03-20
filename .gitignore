@@ -2,6 +2,8 @@
 /.env*
 !/.env.sample
 /public/uploads/
+/var/db/cache*.db
+!/var/db/
 
 ###> symfony/framework-bundle ###
 /.env.local
@@ -9,7 +11,7 @@
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/var/
+/var/*
 /vendor/
 ###< symfony/framework-bundle ###
 
