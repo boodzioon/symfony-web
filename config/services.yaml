@@ -39,4 +39,4 @@ services:
         arguments: 
             $targetDirectory: '%videos_directory%'
 
-    App\Utils\Interfaces\CacheInterface: '@App\Utils\FilesCache'
+    App\Utils\Interfaces\CacheInterface: '@App\Utils\SqliteCache'
